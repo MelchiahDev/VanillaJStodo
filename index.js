@@ -1,9 +1,10 @@
-import TodoItem from "./todoItem.js";
+import SaveTodo from "./saveTodoComponent.js";
+import { loadTodoItems } from "./todoItemInterface.js";
 
 (async () => {
 
-    const todoItemOne = await TodoItem(document.getElementById("main-container"));
-    const todoItemTwo = await TodoItem(document.getElementById("main-container"));
-    
+    const todosContainer = document.getElementById("todos-container");
+    const todoEntry = await SaveTodo(todosContainer);
+    loadTodoItems(todosContainer);
 
 })();
