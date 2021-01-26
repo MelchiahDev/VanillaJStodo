@@ -2,6 +2,14 @@
 
 import TodoItem from "./todoItemComponent.js";
 
+const parseTodoItems = async () => {
+    const name = 'todoList';
+    const str = window.localStorage;
+    const arr = JSON.parse(str.getItem(name));
+
+    return arr;
+}
+
 export const insertTodoItemToLS = (textInput) => {
     const name = 'todoList'
     const str = window.localStorage;
@@ -18,29 +26,26 @@ export const insertTodoItemToLS = (textInput) => {
     }
 }
    
-export const fetchItemCount = () => {
-    const name = 'todoList'
-    const str = window.localStorage;
-    let count = 0;
-    
-    const arr = JSON.parse(str.getItem(name));
+export const fetchItemCount = async () => {
+   const arr = await parseTodoItems();
 
-    for(let item in arr){
-        count++;
-    }
-
-    return count;
+   if(arr){
+       return arr.length;
+   }
 
 };
 
-export const fetchTodoItemText = () => {
-
-
+export const fetchLastTodoItem = async () => {
+    const arr = await parseTodoItems();
+    
+    if(arr){
+     return arr[arr.length - 1];   
+    }
 
 };
 
 export const loadTodoItems = async (element) => {
-    const itemsAmount = fetchItemCount();
+    const itemsAmount = await fetchItemCount();
 
     for(let i = 0; i < itemsAmount; i++){
         await TodoItem(element);

@@ -1,19 +1,27 @@
 import cssComponentHelper from './componentHelper.js';
 const {
     initializeElement,
-    findElementFromClassname
+    findElementFromClassname,
+    returnElementFromClassname
 } = cssComponentHelper;
 
-export default (async (parent) => {
+import {
+    addTodoItemToDocumentEvent
+} from './componentEvents.js';
+
+
+export default async (parent) => {
 
     const _element_ = document.createElement("div");
 
-    const classNames = {
+    const className = 'todoItem';
+
+    const classNames = Object.freeze({
         button: "btn",
         todoItemInput: "todoItemInput",
         todoItemDelBtn: "todoItemDelBtn",
         todoItemDoneBtn: "todoItemDoneBtn"
-    };
+    });
 
     const _html_ = /*html*/ `
         <input type="text" name="" class="${classNames.todoItemInput}" value="">
@@ -21,9 +29,7 @@ export default (async (parent) => {
         <button type="submit" class= "btn ${classNames.todoItemDoneBtn}">Done</button>
     `;
 
-
-
-    initializeElement(_element_)(parent)(_html_)('todoItem');
+    initializeElement(_element_)(parent)(_html_)(className);
     
 
 
@@ -105,6 +111,14 @@ export default (async (parent) => {
 
     const _events_ = {};
 
+    _events_[className] = (async (el) => {
+
+        parent.addEventListener(addTodoItemToDocumentEvent.state.eventName, (event) => {
+            // Do nothing...
+        });
+
+    })(_element_);
+
     _events_[classNames.todoItemDelBtn] = (async (el) => {
 
         el.addEventListener('click', (event) => {
@@ -120,4 +134,4 @@ export default (async (parent) => {
     return {
         element: _element_
     };
-});
+};

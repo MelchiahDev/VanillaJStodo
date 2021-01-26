@@ -4,10 +4,14 @@ export default (() => {
         initializeElement: (element) => (parent) => (html) => (className) => {
             if(typeof html === 'string'){
                 element.innerHTML = html;
+            }else{
+                throw new Error(`⛑ ERROR: _html_ within compnent, not of type 'string'.`);
             }
             
             if(typeof className === `string`){
                 element.classList.add(className);
+            }else{
+                throw new Error(`⛑ ERROR: className within component, not of type 'string'.`);
             }
 
             if(parent){

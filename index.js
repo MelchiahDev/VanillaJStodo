@@ -1,10 +1,8 @@
-import SaveTodo from "./saveTodoComponent.js";
-import { loadTodoItems } from "./todoItemInterface.js";
+import todoContainerComponent from "./todosContainerComponent.js";
 
 (async () => {
 
-    const todosContainer = document.getElementById("todos-container");
-    const todoEntry = await SaveTodo(todosContainer);
-    loadTodoItems(todosContainer);
+    const mainContainer = document.getElementById("main-container");
+    await todoContainerComponent(mainContainer);
 
 })();

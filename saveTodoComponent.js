@@ -1,3 +1,5 @@
+import TodoItem from "./todoItemComponent.js";
+
 import ComponentHelper from './componentHelper.js';
 const {
     initializeElement,
@@ -9,9 +11,17 @@ import {
     insertTodoItemToLS
 } from './todoItemInterface.js';
 
-export default (async (parent) => {
+import {
+    addTodoItemToDocumentEvent
+} from './componentEvents.js';
+import todoItemComponent from "./todoItemComponent.js";
+
+
+export default async (parent) => {
 
     const _element_ = document.createElement('div');
+
+    const className = 'todoSave'
 
     const classNames = {
         saveItemLabel: "saveItemLabel",
@@ -25,7 +35,9 @@ export default (async (parent) => {
         <button class=${classNames.saveButton}>Save</button>
     `;
 
-    initializeElement(_element_)(parent)(_html_)('todoSave');
+    initializeElement(_element_)(parent)(_html_)(className);
+
+
 
     const _css_ = {
         saveItemLabel: (async (el) => {
@@ -85,13 +97,32 @@ export default (async (parent) => {
 
     const _events_ = {};
 
+    _events_[className] = (async (el) => {
+
+        console.log(addTodoItemToDocumentEvent.state.eventName);
+
+        el.addEventListener(addTodoItemToDocumentEvent.state.eventName,async (event) => {
+            const todoItem = await TodoItem(parent);
+            todoItem.element.children[0].value = event.detail.textInput;
+        });
+
+    })(_element_);
+
+    _events_[classNames.saveItemInput] = (async (el) => {
+
+    })(_element_);
+
     _events_[classNames.saveButton] = (async (el) => {
         // This button will add items to localStorage.
 
         const InputTextElement = returnElementFromClassname(el)(classNames.saveItemInput);
 
         el.addEventListener('click', (event) => {
+
             if(event.target.classList.contains(classNames.saveButton)){
+
+                addTodoItemToDocumentEvent.createEvent(InputTextElement.value);
+                addTodoItemToDocumentEvent.dispatch(el);
                 insertTodoItemToLS(InputTextElement.value);
             }
         }, {
@@ -103,4 +134,4 @@ export default (async (parent) => {
     return {
         element: _element_
     };
-})
+};
