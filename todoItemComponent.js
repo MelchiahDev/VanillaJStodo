@@ -9,6 +9,10 @@ import {
     addTodoItemToDocumentEvent
 } from './componentEvents.js';
 
+import {
+    pluckItem
+} from './todoItemInterface.js';
+
 
 export default async (parent) => {
 
@@ -46,19 +50,19 @@ export default async (parent) => {
         const className = classNames.todoItemInput;
 
         findElementFromClassname(el)(className)((child) => {
-            child.style.marginRight = "2rem";
-            child.style.padding = "0.5rem 1rem";
-            child.style.width = "20rem";
-            child.style.border = "none";
-            child.style.borderRadius = "0.5rem";
-
-            
-
+            if(child instanceof HTMLElement){
+                child.style.marginRight = "2rem";
+                child.style.padding = "0.5rem 1rem";
+                child.style.width = "20rem";
+                child.style.border = "none";
+                child.style.borderRadius = "0.5rem";
+                child.style.opacity = 0.5;
+            }
         });
 
         el.addEventListener('mouseover', (event) => {
             if(event.target.className === className){
-                event.target.style.backgroundColor = "green";
+                event.target.style.opacity = 1;
             }
         }, {
             passive: true
@@ -66,7 +70,7 @@ export default async (parent) => {
 
         el.addEventListener('mouseout', (event) => {
             if(event.target.className === className){
-                event.target.style.backgroundColor = "white";
+                event.target.style.opacity = 0.5;
             }
         }, {
             passive: true
@@ -121,8 +125,48 @@ export default async (parent) => {
 
     _events_[classNames.todoItemDelBtn] = (async (el) => {
 
-        el.addEventListener('click', (event) => {
-            if(event.target.classList.contains(classNames.todoItemDelBtn)){
+        const fetchElementIndex = (element, eventTarget) => {
+            let target = undefined;
+
+            if (eventTarget.parentNode instanceof HTMLDivElement){
+                target = eventTarget.parentNode;
+
+                if(!(target)){
+                    throw new Error();
+                }
+
+            }else {
+                throw new TypeError();
+            }
+
+            if (!(element instanceof HTMLDivElement)){
+                throw new TypeError();
+            }
+
+            const children = Array.from(element.parentNode.children);
+            
+            const todoItems = children.filter(child => {
+                const $classNames = child.classList;
+                
+                for(const $className of $classNames){
+                    return ($className === className);
+                }
+            });
+            
+            let index;
+            todoItems.forEach((elements, $index) => {
+                if(Object.is(elements, target)){
+                    index = $index;
+                }
+            })
+
+            return index;
+
+        }        
+
+        el.addEventListener('click', async (event) => {
+            if(Object.is(event.target, returnElementFromClassname(el)(classNames.todoItemDelBtn))){
+                await pluckItem(fetchElementIndex(el, event.target));
                 el.remove();
             }
         });

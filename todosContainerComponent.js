@@ -6,10 +6,14 @@ const {
 } = cssComponentHelper;
 
 import {
-    loadTodoItems
+    parseTodoItems
 } from "./todoItemInterface.js";
 
 import SaveTodoComponent from "./saveTodoComponent.js";
+import TodoItemComponent from "./todoItemComponent.js";
+import todoItemComponent from './todoItemComponent.js';
+
+
 
 export default async (parent) => {
 
@@ -39,8 +43,18 @@ export default async (parent) => {
 
     _events_[className] = (async (el) => {
 
+        const loadTodoItems = async () => {
+            const itemValues = await parseTodoItems();
+
+            for (const itemValue of itemValues){
+                const { element } = await todoItemComponent(el);
+                const todoItemInputElement = element.children[0];
+                todoItemInputElement.value = itemValue;
+            }
+        }
+
         await SaveTodoComponent(el);
-        await loadTodoItems(el);
+        loadTodoItems();
 
     })(_element_);
     

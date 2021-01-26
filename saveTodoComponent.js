@@ -63,17 +63,17 @@ export default async (parent) => {
 
             });
 
-            el.addEventListener('mouseover', (event) => {
+            el.addEventListener('focusin', (event) => {
                 if(event.target.className === className){
-                    event.target.style.backgroundColor = "green";
+                    event.target.style.boxShadow = "0px 0px 10px 5px rgba(0,223,255,0.50)";
                 }
             }, {
                 passive: true
             });
 
-            el.addEventListener('mouseout', (event) => {
+            el.addEventListener('focusout', (event) => {
                 if(event.target.className === className){
-                    event.target.style.backgroundColor = "white";
+                    event.target.style.boxShadow = "none";
                 }
             }, {
                 passive: true

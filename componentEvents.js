@@ -6,7 +6,7 @@ export const addTodoItemToDocumentEvent = Object.freeze({
     }),
     createEvent(textInput) {
         if(typeof textInput !== "string"){
-            throw new Error(`ERROR: textInput is not a string`);
+            throw new TypeError();
         }
 
         this.state.event = new CustomEvent(this.state.eventName, {

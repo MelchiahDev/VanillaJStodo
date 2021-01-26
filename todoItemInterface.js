@@ -1,18 +1,19 @@
 "use strict";
 
-import TodoItem from "./todoItemComponent.js";
+const state = {
+    name : 'todoList',
+    str : window.localStorage,
+};
 
-const parseTodoItems = async () => {
-    const name = 'todoList';
-    const str = window.localStorage;
+export const parseTodoItems = async () => {
+    const { name, str } = state;
     const arr = JSON.parse(str.getItem(name));
 
     return arr;
 }
 
 export const insertTodoItemToLS = (textInput) => {
-    const name = 'todoList'
-    const str = window.localStorage;
+    const { name, str } = state;
 
     if(str.getItem(name) === null){
         const arr = [];
@@ -29,7 +30,7 @@ export const insertTodoItemToLS = (textInput) => {
 export const fetchItemCount = async () => {
    const arr = await parseTodoItems();
 
-   if(arr){
+   if(arr instanceof Array){
        return arr.length;
    }
 
@@ -38,16 +39,27 @@ export const fetchItemCount = async () => {
 export const fetchLastTodoItem = async () => {
     const arr = await parseTodoItems();
     
-    if(arr){
+    if(arr instanceof Array){
      return arr[arr.length - 1];   
     }
 
 };
 
-export const loadTodoItems = async (element) => {
-    const itemsAmount = await fetchItemCount();
-
-    for(let i = 0; i < itemsAmount; i++){
-        await TodoItem(element);
+export const pluckItem = async (elementNo) => {
+    if (typeof elementNo !== 'number'){
+        throw new TypeError();
     }
-};
+
+    const { name, str } = state;
+    let arr = await parseTodoItems();
+
+    if (arr instanceof Array){
+
+        arr.splice(elementNo, 1);
+        str.removeItem(name);
+        str.setItem(name, JSON.stringify(arr));
+                
+    }else{
+        throw new TypeError();
+    }
+}
