@@ -5,6 +5,7 @@
   padding: 0;
   font-family: "Poppins", sans-serif;
   font-size: 18px;
+  box-sizing: border-box;
 }
 
 *:focus, *:hover {
@@ -17,21 +18,21 @@ body {
 
 #main-container {
   display: flex;
+  padding: 0 2rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
 #app-header {
-  margin-top: 20vh;
+  margin-top: 10vh;
+  margin-bottom: 4rem;
   font-size: 4rem;
   color: white;
 }
 
-@media screen and (orientation: portrait) {
-
+@media screen and (max-width: 400px){
 #app-header {
-  margin-top: 5vh;
+  font-size: 3rem;
 }
-
-}
+};

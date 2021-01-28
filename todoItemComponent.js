@@ -6,12 +6,18 @@ const {
 } = cssComponentHelper;
 
 import {
-    addTodoItemToDocumentEvent
+    addTodoItemToDocumentEvent,
+    removeTodoItemEvent
 } from './componentEvents.js';
 
 import {
-    pluckItem
+    mediaQueries
+} from './componentConstObjects.js';
+
+import {
+    fetchLastTodoItem
 } from './todoItemInterface.js';
+
 
 
 export default async (parent) => {
@@ -22,15 +28,28 @@ export default async (parent) => {
 
     const classNames = Object.freeze({
         button: "btn",
+        buttonContainer: "buttonContainer",
         todoItemInput: "todoItemInput",
         todoItemDelBtn: "todoItemDelBtn",
         todoItemDoneBtn: "todoItemDoneBtn"
     });
 
+    const classNameREG = /todoItem/;
+
+    const classNamesREG = Object.freeze({
+        button: /btn/,
+        buttonContainer: /buttonContainer/,
+        todoItemInput: /todoItemInput/,
+        todoItemDelButton: /todoItemDelBtn/,
+        todoItemDoneBtn: /todoItemDoneBtn/
+    });
+
     const _html_ = /*html*/ `
-        <input type="text" name="" class="${classNames.todoItemInput}" value="">
-        <button type="submit" class="btn ${classNames.todoItemDelBtn}">Delete</button>
-        <button type="submit" class= "btn ${classNames.todoItemDoneBtn}">Done</button>
+        <input type="text" name="" class="${classNames.todoItemInput}" value=""/>
+        <div class="${classNames.buttonContainer}">
+            <button type="submit" class= "btn ${classNames.todoItemDoneBtn}">✔️</button>
+            <button type="submit" class="btn ${classNames.todoItemDelBtn}">✖️</button>
+        </div>
     `;
 
     initializeElement(_element_)(parent)(_html_)(className);
@@ -39,24 +58,42 @@ export default async (parent) => {
 
     const _css_ = {
         element: (async (el) => {
+            const todoItemInput = returnElementFromClassname(el)(classNames.todoItemInput);
 
             el.style.color = "white";
             el.style.margin = "1rem 0";
+            el.style.display = "flex";
+            el.style.alignItems = "center";
+            el.style.justifyContent = "space-around";
+
+            Array.from(el.children).forEach((elem) => {
+                elem.style.marginBottom = "1rem";
+            })
+
+            if((window.innerHeight/window.innerWidth) > 1){ // Portrait
+                el.style.flexDirection = "column";
+                el.style.alignItems = "flex-start";
+
+                todoItemInput.style.width = "18rem";
+            }
 
         })(_element_)
     }
+
 
     _css_[classNames.todoItemInput] = (async (el) => {
         const className = classNames.todoItemInput;
 
         findElementFromClassname(el)(className)((child) => {
             if(child instanceof HTMLElement){
+
                 child.style.marginRight = "2rem";
                 child.style.padding = "0.5rem 1rem";
-                child.style.width = "20rem";
+                child.style.maxWidth = "20rem";
                 child.style.border = "none";
                 child.style.borderRadius = "0.5rem";
                 child.style.opacity = 0.5;
+
             }
         });
 
@@ -76,38 +113,37 @@ export default async (parent) => {
             passive: true
         });
 
-
     })(_element_);
 
-    _css_[classNames.button] = (async (el) => {
-        const className = classNames.button;
+    
+    _css_[classNames.buttonContainer] = (async (el) => {
+        const className = classNames.buttonContainer;
 
         findElementFromClassname(el)(className)((child) => {
-            child.style.backgroundColor = "white";
-            child.style.padding = "0.5rem 1rem";
-            child.style.border = "none";
-            child.style.borderRadius = "0.5rem";
-            child.style.color = "white";
+
+            findElementFromClassname(child)(classNames.button)((child) => {
+                if(child instanceof HTMLButtonElement){
+                    child.style.padding = "0.5rem 1rem";
+                    child.style.borderRadius = "0.5rem";
+                }
+            });
+
+            findElementFromClassname(child)(classNames.todoItemDelBtn)((child) => {
+                if(child instanceof HTMLButtonElement){
+                    child.style.color = "white";
+                    child.style.backgroundColor = "tomato";
+                }
+            });
+
+            findElementFromClassname(child)(classNames.todoItemDoneBtn)((child) => {
+                if(child instanceof HTMLButtonElement){
+                    child.style.color = "white";
+                    child.style.backgroundColor = "limegreen";
+                }              
+            });
+
         });
 
-    })(_element_) 
-
-    _css_[classNames.todoItemDelBtn] = (async (el) => {
-        const className = classNames.todoItemDelBtn;
-
-        findElementFromClassname(el)(className)((child) => {
-            child.style.backgroundColor = '#E94F2D';
-            child.style.color = "white";
-        });
-
-    })(_element_);
-
-    _css_[classNames.todoItemDoneBtn] = ( async (el) => {
-        const className = classNames.todoItemDoneBtn;
-
-        findElementFromClassname(el)(className)((child) => {
-            child.style.backgroundColor = 'limegreen';
-        });
 
     })(_element_);
 
@@ -115,59 +151,25 @@ export default async (parent) => {
 
     const _events_ = {};
 
+
     _events_[className] = (async (el) => {
 
-        parent.addEventListener(addTodoItemToDocumentEvent.state.eventName, (event) => {
-            // Do nothing...
-        });
+        // Do nothing...
 
     })(_element_);
 
+
+    _events_[classNames.buttonContainer] = (async (el) => {
+        // Don nothing...
+    })(_element_);
+
+
     _events_[classNames.todoItemDelBtn] = (async (el) => {
 
-        const fetchElementIndex = (element, eventTarget) => {
-            let target = undefined;
-
-            if (eventTarget.parentNode instanceof HTMLDivElement){
-                target = eventTarget.parentNode;
-
-                if(!(target)){
-                    throw new Error();
-                }
-
-            }else {
-                throw new TypeError();
-            }
-
-            if (!(element instanceof HTMLDivElement)){
-                throw new TypeError();
-            }
-
-            const children = Array.from(element.parentNode.children);
-            
-            const todoItems = children.filter(child => {
-                const $classNames = child.classList;
-                
-                for(const $className of $classNames){
-                    return ($className === className);
-                }
-            });
-            
-            let index;
-            todoItems.forEach((elements, $index) => {
-                if(Object.is(elements, target)){
-                    index = $index;
-                }
-            })
-
-            return index;
-
-        }        
-
         el.addEventListener('click', async (event) => {
-            if(Object.is(event.target, returnElementFromClassname(el)(classNames.todoItemDelBtn))){
-                await pluckItem(fetchElementIndex(el, event.target));
-                el.remove();
+            if(classNamesREG.todoItemDelButton.test(event.target.className)){
+                removeTodoItemEvent.createEvent();
+                removeTodoItemEvent.dispatch(el);
             }
         });
 
